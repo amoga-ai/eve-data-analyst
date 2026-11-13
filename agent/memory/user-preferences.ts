@@ -1,6 +1,5 @@
 import { defineMemory } from "eve/memory";
-import { fileMemory } from "eve/memory/file";
-
+import { fileMemory, inMemory } from "eve/memory/file";
 import { byHumanPrincipal } from "../lib/memory/scope";
 
 /**
@@ -9,6 +8,6 @@ import { byHumanPrincipal } from "../lib/memory/scope";
 export default defineMemory({
   description:
     "Remember the user's stable preferences for answers (e.g., number formatting, default time window, preferred chart types) and personal context (e.g., their team or region). Never save metric definitions or SQL: the metric-definitions skill is the source of truth.",
-  provider: fileMemory(),
+  provider: fileMemory({ backend: inMemory() }),
   scope: byHumanPrincipal,
 });
