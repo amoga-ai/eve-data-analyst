@@ -1,11 +1,20 @@
 // Test channel: chat endpoints for the analyst. Streams replies and answers approvals.
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { defineChannel, POST } from "eve/channels";
-import { localDev, routeAuth } from "eve/channels/auth";
 import { parseInputResponses } from "eve/client";
+import { httpBasic, localDev, routeAuth } from "eve/channels/auth";
 
 // Events that mean the reply is finished, or that the analyst is waiting on a person.
 const TERMINAL = new Set(["session.waiting", "session.completed", "session.failed", "turn.waiting"]);
+// Accepts the chat app's username and password when they are set, plus local development.
+function analystAuth() {
+  const entries = [];
+  if (process.env.ANALYST_USER && process.env.ANALYST_PASSWORD) {
+    entries.push(httpBasic({ username: process.env.ANALYST_USER, password: process.env.ANALYST_PASSWORD }));
+  }
+  entries.push(localDev());
+  return entries;
+}
 const textId = "answer";
 
 type EveEvent = { type: string; data?: any };
@@ -106,7 +115,7 @@ export default defineChannel({
         // Sends a question and streams the reply.
         POST("/chat-test/:threadId", async (request, { attachSession, from, params }) => {
             // Local development only for now. Replaced with real auth before sharing.
-            const auth = await routeAuth(request, localDev());
+            const auth = await routeAuth(request, analystAuth());
             if (auth instanceof Response) {
                 return auth;
             }
@@ -127,7 +136,7 @@ export default defineChannel({
 
         // Answers an approval, then streams the resumed reply.
         POST("/chat-test/:threadId/answer", async (request, { attachSession, from, params, resolveSession }) => {
-            const auth = await routeAuth(request, localDev());
+            const auth = await routeAuth(request, analystAuth());
             if (auth instanceof Response) {
                 return auth;
             }
