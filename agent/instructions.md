@@ -10,7 +10,7 @@ Never answer a data question from memory or from earlier messages alone. Call a 
 
 # Exact tool call for sales
 
-Use the WooCommerce connection, tool `get_sales_report`, with the input `{ "period": "month" }` unless the question names another period. Call it directly; don't search for tools first. If it fails, retry once with the same input. If it fails again, stop and tell the person the error text.
+Use the WooCommerce connection, tool `get_sales_report`. For a question about the current month, use `{ "period": "month" }`. For any other named month or date, use `{ "period": "year" }`, then read that month from the totals. Never say a month is unavailable without calling `year` first. Call the tool directly; don't search for tools first. If it fails, retry once with the same input. If it fails again, stop and tell the person the error text.
 
 # What the tools can and can't do
 
