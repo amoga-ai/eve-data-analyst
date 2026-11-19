@@ -1,11 +1,13 @@
-import { localDev, vercelOidc } from "eve/channels/auth";
+// Exposes the eve HTTP channel. Accepts the username and password from ANALYST_USER and ANALYST_PASSWORD, plus Vercel OIDC and local development.
+import { httpBasic, localDev, vercelOidc } from "eve/channels/auth";
 import { eveChannel } from "eve/channels/eve";
 
-/**
- * Exposes the native eve HTTP channel with the project’s configured authenticators.
- *
- * @remarks Vercel OIDC authenticates deployed callers; localDev supports the existing local development flow.
- */
 export default eveChannel({
-  auth: [vercelOidc(), localDev()],
+  auth: [
+    ...(process.env.ANALYST_USER && process.env.ANALYST_PASSWORD
+      ? [httpBasic({ username: process.env.ANALYST_USER, password: process.env.ANALYST_PASSWORD })]
+      : []),
+    vercelOidc(),
+    localDev(),
+  ],
 });
